@@ -16,6 +16,8 @@ import com.protectra.sp.entity.BackupBatch;
 import com.protectra.sp.kafka.KafkaProducerService;
 import com.protectra.sp.repo.AssetRepository;
 import com.protectra.sp.repo.BackupBatchRepository;
+import com.safestack.backup.BackupEventDto;
+import com.safestack.exception.SafeStackException;
 
 import jakarta.annotation.PostConstruct;
 import jakarta.annotation.PreDestroy;
@@ -64,6 +66,26 @@ public class SharePointQueueService {
                 // Process each asset to create a BackupBatch
             	
             	if(asset.getSiteName().equalsIgnoreCase("site1")) {
+            		
+            		
+
+                    try {
+                        BackupEventDto backupEventDto = new BackupEventDto();
+                        backupEventDto.setDeviceUUID(asset.getDeviceUUID());
+                       // backupEventDto.setHostName(hostName);
+                        backupEventDto.setIsFullBackup(false);
+                        backupService.saveBackupProcess(backupEventDto);
+                        log.info("Backup initiated successfully for device UUID: {}", asset.getDeviceUUID());
+                    } catch (SafeStackException e) {
+                        log.error("Failed to process backup for device UUID: {}. Reason: {}", 
+                                  asset.getDeviceUUID(), e.getMessage(), e);
+                    } catch (Exception e) {
+                        log.error("Unexpected error during backup for device UUID: {}", 
+                        		asset.getDeviceUUID(), e);
+                    }
+                
+            		
+            		
                 BackupBatch batch = new BackupBatch();
                 batch.setAssetId(asset.getId());
                 batch.setStatus("QUEUED"); // Set the status of the batch to QUEUED
