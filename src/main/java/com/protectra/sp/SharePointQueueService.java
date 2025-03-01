@@ -6,6 +6,7 @@ import java.util.concurrent.Executors;
 import java.util.concurrent.ScheduledExecutorService;
 import java.util.concurrent.TimeUnit;
 
+import org.apache.commons.lang3.StringUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -62,8 +63,7 @@ public class SharePointQueueService {
         assets.parallelStream().forEach(asset -> {
             try {
                 // Process each asset to create a BackupBatch
-            	
-            	if(asset.getSiteName().equalsIgnoreCase("site1")) {
+            	if(!StringUtils.isEmpty(asset.getSiteName()) && asset.getSiteName().equalsIgnoreCase("site1")) {
                 BackupBatch batch = new BackupBatch();
                 batch.setAssetId(asset.getId());
                 batch.setStatus("QUEUED"); // Set the status of the batch to QUEUED
